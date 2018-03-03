@@ -97,47 +97,49 @@ X_test_reduce30 = SelectPercentile(percentile=30).fit_transform(X_test, y_test)
 X_train_reduce10 = SelectPercentile().fit_transform(X_train, y_train)
 X_test_reduce10 = SelectPercentile().fit_transform(X_test, y_test)
 
-from sklearn import tree
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.naive_bayes import GaussianNB
+## The comparison can take a while to run so uncomment if you wish to run.
 
-from sklearn.cross_validation import cross_val_score, cross_val_predict
-from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
-from time import time
-
-import warnings
-
-models = {"AdaBoost Classifier": AdaBoostClassifier(), "Gaussian Naive Bayes": GaussianNB(),
-          "Decision Tree Classifier": tree.DecisionTreeClassifier(), "Random Forest Classifier": RandomForestClassifier()}
-
-
-data = {"": X_train, "(30% of features)": X_train_reduce30, "(10% of features)": X_train_reduce10,
-       "(PCA: 2 components)": X_train_pca2, "(PCA: 5 components)": X_train_pca5}
-
-res = {}
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-
-    for name, model in models.items():
-        for scale, X in data.items():
-            n = name + " " + scale
-            clf = model
-            accuracy = cross_val_score(clf, X_train, y_train).mean()
-
-            y_pred = cross_val_predict(clf, X_train, y_train)
-
-            rec = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
-            prec = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
-            f1 = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
-
-
-            res[n] = {"MeanAccuracy": accuracy, "Precision": prec, "Recall": rec, "F1Score": f1}
-
-results = pd.DataFrame.from_dict(res, orient="index")
-results = results[["MeanAccuracy", "Precision", "Recall", "F1Score"]]
-
-results
+# from sklearn import tree
+# from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+# from sklearn.naive_bayes import GaussianNB
+#
+# from sklearn.cross_validation import cross_val_score, cross_val_predict
+# from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
+# from time import time
+#
+# import warnings
+#
+# models = {"AdaBoost Classifier": AdaBoostClassifier(), "Gaussian Naive Bayes": GaussianNB(),
+#           "Decision Tree Classifier": tree.DecisionTreeClassifier(), "Random Forest Classifier": RandomForestClassifier()}
+#
+#
+# data = {"": X_train, "(30% of features)": X_train_reduce30, "(10% of features)": X_train_reduce10,
+#        "(PCA: 2 components)": X_train_pca2, "(PCA: 5 components)": X_train_pca5}
+#
+# res = {}
+#
+# with warnings.catch_warnings():
+#     warnings.simplefilter("ignore")
+#
+#     for name, model in models.items():
+#         for scale, X in data.items():
+#             n = name + " " + scale
+#             clf = model
+#             accuracy = cross_val_score(clf, X_train, y_train).mean()
+#
+#             y_pred = cross_val_predict(clf, X_train, y_train)
+#
+#             rec = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
+#             prec = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
+#             f1 = cross_val_score(clf, X_train, y_train, scoring=make_scorer(recall_score)).mean()
+#
+#
+#             res[n] = {"MeanAccuracy": accuracy, "Precision": prec, "Recall": rec, "F1Score": f1}
+#
+# results = pd.DataFrame.from_dict(res, orient="index")
+# results = results[["MeanAccuracy", "Precision", "Recall", "F1Score"]]
+#
+# results
 
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall
@@ -148,9 +150,7 @@ results
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
 
 # Example starting point. Try investigating other evaluation techniques!
-from sklearn.cross_validation import train_test_split
-features_train, features_test, labels_train, labels_test = \
-    train_test_split(features, labels, test_size=0.3, random_state=42)
+
 
 ### Task 6: Dump your classifier, dataset, and features_list so anyone can
 ### check your results. You do not need to change anything below, but make sure
