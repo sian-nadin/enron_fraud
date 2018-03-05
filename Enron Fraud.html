@@ -11793,7 +11793,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
@@ -11803,6 +11803,24 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectPercentile</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">tree</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">AdaBoostClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">cross_val_predict</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
@@ -12079,7 +12097,6 @@ Number of POI in poi_names.txt: 35
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># How many people in this dataset have a quantified salary, known email address or NaN payments?</span>
-
 <span class="k">print</span> <span class="s2">&quot;The number of quantified salaries is:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;salary&#39;</span><span class="p">]</span> <span class="o">!=</span><span class="s1">&#39;NaN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="k">print</span> <span class="s2">&quot;The total number of given email addresses is:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;email_address&#39;</span><span class="p">]</span> <span class="o">!=</span><span class="s1">&#39;NaN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="k">print</span> <span class="s2">&quot;The number of NaN payments is:&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_payments&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;NaN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -12386,7 +12403,7 @@ The number of NaN payments is: 21
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;seaborn.axisgrid.FacetGrid at 0x109526550&gt;</pre>
+<pre>&lt;seaborn.axisgrid.FacetGrid at 0x1a0a6fdb10&gt;</pre>
 </div>
 
 </div>
@@ -12677,7 +12694,7 @@ I0dPJCsAAAAASUVORK5CYII=
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;seaborn.axisgrid.FacetGrid at 0x1095a9a50&gt;</pre>
+<pre>&lt;seaborn.axisgrid.FacetGrid at 0x1a0a74bbd0&gt;</pre>
 </div>
 
 </div>
@@ -13692,31 +13709,9 @@ Although we can measure the performance of our model by running run it on a set 
 <div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span> <span class="s1">&#39;email_address&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">df_new</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span> <span class="s1">&#39;email_address&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">poi</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Generate the training and testing data</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">StratifiedKFold</span>
-<span class="n">skf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">skf</span><span class="o">.</span><span class="n">get_n_splits</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-<span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span> <span class="ow">in</span> <span class="n">skf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="c1">#print(&quot;TRAIN:&quot;, train_index, &quot;TEST:&quot;, test_index)</span>
-    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
-    <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
 </pre></div>
 
 </div>
@@ -13754,41 +13749,35 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Generate the training and testing data</span>
+<span class="n">skf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">skf</span><span class="o">.</span><span class="n">get_n_splits</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span> <span class="ow">in</span> <span class="n">skf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+    <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
 
-<span class="n">X_train_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-<span class="n">X_test_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
 
-<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+    <span class="n">X_train_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+    <span class="n">X_test_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 
-<span class="n">X_train_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-<span class="n">X_test_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
-</pre></div>
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
 
-</div>
-</div>
-</div>
+    <span class="n">X_train_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+    <span class="n">X_test_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectPercentile</span>
+    <span class="n">X_train_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">X_test_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 
-<span class="n">X_train_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">X_test_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
-
-<span class="n">X_train_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="n">X_test_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+    <span class="n">X_train_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">X_test_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13812,8 +13801,8 @@ Although we can measure the performance of our model by running run it on a set 
 <p>Accuracy, precision, recall and f1 score are used as metrics to evaluate the model performance.</p>
 <ul>
 <li>Accuracy: True Positive + True Negative / (True Positive + True Negative + False Positive + False Negative). Accuracy measures the percentage of correctly identified POIs and non-POIs from all of the predictions made. Accuracy is a good initial indicator but it can be misleading.</li>
-<li>Precision: True Positive / (True Positive + False Positive). Precision measures how many of the items labeled as positive truely belong to the positive class.</li>
-<li>Recall:  True Positive / (True Positive + False Negative). Recall measure out of all the items that are truely positive, how many were correctly classified as positive. </li>
+<li>Precision: True Positive / (True Positive + False Positive). Precision measures how many of the items labeled as positive truely belong to the positive class. Precision will show out of the cases that are identified as POIs how many are actually POIs.</li>
+<li>Recall:  True Positive / (True Positive + False Negative). Recall measure out of all the items that are truely positive, how many were correctly classified as positive. Recall will show out of the cases that are actually POIs how many were identified as POIs.</li>
 <li>F1 score gives a harmonic mean of precision and recall.</li>
 </ul>
 
@@ -13822,51 +13811,54 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">tree</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">AdaBoostClassifier</span>
-<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
-
-<span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">cross_val_predict</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span><span class="p">,</span> <span class="n">f1_score</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-
-<span class="kn">import</span> <span class="nn">warnings</span>
-
-<span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;AdaBoost Classifier&quot;</span><span class="p">:</span> <span class="n">AdaBoostClassifier</span><span class="p">(),</span> <span class="s2">&quot;Gaussian Naive Bayes&quot;</span><span class="p">:</span> <span class="n">GaussianNB</span><span class="p">(),</span> 
-          <span class="s2">&quot;Decision Tree Classifier&quot;</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(),</span> <span class="s2">&quot;Random Forest Classifier&quot;</span><span class="p">:</span> <span class="n">RandomForestClassifier</span><span class="p">()}</span> 
-          
-
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">X_train</span><span class="p">,</span> <span class="s2">&quot;(30</span><span class="si">% o</span><span class="s2">f features)&quot;</span><span class="p">:</span> <span class="n">X_train_reduce30</span><span class="p">,</span> <span class="s2">&quot;(10</span><span class="si">% o</span><span class="s2">f features)&quot;</span><span class="p">:</span> <span class="n">X_train_reduce10</span><span class="p">,</span>
-       <span class="s2">&quot;(PCA: 2 components)&quot;</span><span class="p">:</span> <span class="n">X_train_pca2</span><span class="p">,</span> <span class="s2">&quot;(PCA: 5 components)&quot;</span><span class="p">:</span> <span class="n">X_train_pca5</span><span class="p">}</span>
-
-<span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">scale</span><span class="p">,</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">scale</span>
-            <span class="n">clf</span> <span class="o">=</span> <span class="n">model</span>
-            <span class="n">accuracy</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    
-            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">cross_val_predict</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-
-            <span class="n">rec</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-            <span class="n">prec</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-            <span class="n">f1</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">rate_models</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;AdaBoost Classifier&quot;</span><span class="p">:</span> <span class="n">AdaBoostClassifier</span><span class="p">(),</span> <span class="s2">&quot;Gaussian Naive Bayes&quot;</span><span class="p">:</span> <span class="n">GaussianNB</span><span class="p">(),</span> 
+                  <span class="s2">&quot;Decision Tree Classifier&quot;</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(),</span> <span class="s2">&quot;Random Forest Classifier&quot;</span><span class="p">:</span> <span class="n">RandomForestClassifier</span><span class="p">()}</span> 
 
 
-            <span class="n">res</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;MeanAccuracy&quot;</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span> <span class="s2">&quot;Precision&quot;</span><span class="p">:</span> <span class="n">prec</span><span class="p">,</span> <span class="s2">&quot;Recall&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="p">,</span> <span class="s2">&quot;F1Score&quot;</span><span class="p">:</span> <span class="n">f1</span><span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">X_train</span><span class="p">,</span> <span class="s2">&quot;(30</span><span class="si">% o</span><span class="s2">f features)&quot;</span><span class="p">:</span> <span class="n">X_train_reduce30</span><span class="p">,</span> <span class="s2">&quot;(10</span><span class="si">% o</span><span class="s2">f features)&quot;</span><span class="p">:</span> <span class="n">X_train_reduce10</span><span class="p">,</span>
+               <span class="s2">&quot;(PCA: 2 components)&quot;</span><span class="p">:</span> <span class="n">X_train_pca2</span><span class="p">,</span> <span class="s2">&quot;(PCA: 5 components)&quot;</span><span class="p">:</span> <span class="n">X_train_pca5</span><span class="p">}</span>
 
-<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;MeanAccuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;Precision&quot;</span><span class="p">,</span> <span class="s2">&quot;Recall&quot;</span><span class="p">,</span> <span class="s2">&quot;F1Score&quot;</span><span class="p">]]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="n">results</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">scale</span><span class="p">,</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">scale</span>
+                <span class="n">clf</span> <span class="o">=</span> <span class="n">model</span>
+                <span class="n">accuracy</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">cross_val_predict</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+                <span class="n">rec</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">prec</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">f1</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">recall_score</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+                <span class="n">res</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;MeanAccuracy&quot;</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span> <span class="s2">&quot;Precision&quot;</span><span class="p">:</span> <span class="n">prec</span><span class="p">,</span> <span class="s2">&quot;Recall&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="p">,</span> <span class="s2">&quot;F1Score&quot;</span><span class="p">:</span> <span class="n">f1</span><span class="p">}</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="p">[[</span><span class="s2">&quot;MeanAccuracy&quot;</span><span class="p">,</span> <span class="s2">&quot;Precision&quot;</span><span class="p">,</span> <span class="s2">&quot;Recall&quot;</span><span class="p">,</span> <span class="s2">&quot;F1Score&quot;</span><span class="p">]]</span>
+
+    <span class="n">display</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rate_models</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13882,20 +13874,263 @@ Although we can measure the performance of our model by running run it on a set 
 <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/Sian/anaconda/envs/DAND/lib/python2.7/site-packages/sklearn/cross_validation.py:41: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. Also note that the interface of the new CV iterators are different from that of this module. This module will be removed in 0.20.
-  &#34;This module will be removed in 0.20.&#34;, DeprecationWarning)
-</pre>
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>MeanAccuracy</th>
+      <th>Precision</th>
+      <th>Recall</th>
+      <th>F1Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AdaBoost Classifier</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>AdaBoost Classifier (10% of features)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>AdaBoost Classifier (30% of features)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>AdaBoost Classifier (PCA: 2 components)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>AdaBoost Classifier (PCA: 5 components)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>Decision Tree Classifier</th>
+      <td>0.835000</td>
+      <td>0.666667</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>Decision Tree Classifier (10% of features)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>Decision Tree Classifier (30% of features)</th>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.666667</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>Decision Tree Classifier (PCA: 2 components)</th>
+      <td>0.848889</td>
+      <td>0.666667</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
+    </tr>
+    <tr>
+      <th>Decision Tree Classifier (PCA: 5 components)</th>
+      <td>0.848889</td>
+      <td>0.444444</td>
+      <td>0.666667</td>
+      <td>0.666667</td>
+    </tr>
+    <tr>
+      <th>Gaussian Naive Bayes</th>
+      <td>0.421667</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+    </tr>
+    <tr>
+      <th>Gaussian Naive Bayes (10% of features)</th>
+      <td>0.421667</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+    </tr>
+    <tr>
+      <th>Gaussian Naive Bayes (30% of features)</th>
+      <td>0.421667</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+    </tr>
+    <tr>
+      <th>Gaussian Naive Bayes (PCA: 2 components)</th>
+      <td>0.421667</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+    </tr>
+    <tr>
+      <th>Gaussian Naive Bayes (PCA: 5 components)</th>
+      <td>0.421667</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+      <td>0.777778</td>
+    </tr>
+    <tr>
+      <th>Random Forest Classifier</th>
+      <td>0.849444</td>
+      <td>0.000000</td>
+      <td>0.111111</td>
+      <td>0.222222</td>
+    </tr>
+    <tr>
+      <th>Random Forest Classifier (10% of features)</th>
+      <td>0.890556</td>
+      <td>0.111111</td>
+      <td>0.111111</td>
+      <td>0.111111</td>
+    </tr>
+    <tr>
+      <th>Random Forest Classifier (30% of features)</th>
+      <td>0.821111</td>
+      <td>0.333333</td>
+      <td>0.111111</td>
+      <td>0.111111</td>
+    </tr>
+    <tr>
+      <th>Random Forest Classifier (PCA: 2 components)</th>
+      <td>0.862778</td>
+      <td>0.222222</td>
+      <td>0.111111</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>Random Forest Classifier (PCA: 5 components)</th>
+      <td>0.849444</td>
+      <td>0.000000</td>
+      <td>0.111111</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
 </div>
 </div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When using the newly generated features we obtain the best results using a Gaussian Naive Bayes algorithm which leads to precision, recall and F1 score of 77.8%. The second best classifier in this case is the Decisio Tree classifier.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Let's-do-the-same-for-the-data-set-that-doesn't-contain-the-newly-generated-features:">Let's do the same for the data set that doesn't contain the newly generated features:<a class="anchor-link" href="#Let's-do-the-same-for-the-data-set-that-doesn't-contain-the-newly-generated-features:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;poi&#39;</span><span class="p">,</span> <span class="s1">&#39;email_address&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">poi</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">skf</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">skf</span><span class="o">.</span><span class="n">get_n_splits</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span> <span class="ow">in</span> <span class="n">skf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+    <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+    <span class="n">X_train_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+    <span class="n">X_test_pca2</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+    <span class="n">X_train_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+    <span class="n">X_test_pca5</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+    <span class="n">X_train_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">X_test_reduce30</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">(</span><span class="n">percentile</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+    <span class="n">X_train_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="n">X_test_reduce10</span> <span class="o">=</span> <span class="n">SelectPercentile</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rate_models</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[20]:</div>
+<div class="prompt"></div>
 
 
 
-<div class="output_html rendered_html output_subarea output_execute_result">
+<div class="output_html rendered_html output_subarea ">
 <div>
 <table border="1" class="dataframe">
   <thead>
@@ -13946,22 +14181,22 @@ Although we can measure the performance of our model by running run it on a set 
     <tr>
       <th>Decision Tree Classifier</th>
       <td>0.848889</td>
-      <td>0.666667</td>
+      <td>0.444444</td>
       <td>0.444444</td>
       <td>0.666667</td>
     </tr>
     <tr>
       <th>Decision Tree Classifier (10% of features)</th>
-      <td>0.862778</td>
+      <td>0.835000</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
       <td>0.666667</td>
-      <td>0.444444</td>
-      <td>0.444444</td>
     </tr>
     <tr>
       <th>Decision Tree Classifier (30% of features)</th>
       <td>0.835000</td>
-      <td>0.666667</td>
-      <td>0.666667</td>
+      <td>0.444444</td>
+      <td>0.444444</td>
       <td>0.444444</td>
     </tr>
     <tr>
@@ -13969,11 +14204,11 @@ Although we can measure the performance of our model by running run it on a set 
       <td>0.848889</td>
       <td>0.666667</td>
       <td>0.444444</td>
-      <td>0.444444</td>
+      <td>0.666667</td>
     </tr>
     <tr>
       <th>Decision Tree Classifier (PCA: 5 components)</th>
-      <td>0.862778</td>
+      <td>0.835000</td>
       <td>0.666667</td>
       <td>0.444444</td>
       <td>0.666667</td>
@@ -14015,38 +14250,38 @@ Although we can measure the performance of our model by running run it on a set 
     </tr>
     <tr>
       <th>Random Forest Classifier</th>
-      <td>0.835000</td>
+      <td>0.821667</td>
       <td>0.111111</td>
       <td>0.111111</td>
-      <td>0.000000</td>
+      <td>0.111111</td>
     </tr>
     <tr>
       <th>Random Forest Classifier (10% of features)</th>
       <td>0.862778</td>
       <td>0.111111</td>
       <td>0.111111</td>
-      <td>0.000000</td>
+      <td>0.111111</td>
     </tr>
     <tr>
       <th>Random Forest Classifier (30% of features)</th>
-      <td>0.848889</td>
-      <td>0.222222</td>
+      <td>0.835556</td>
       <td>0.000000</td>
-      <td>0.222222</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
     </tr>
     <tr>
       <th>Random Forest Classifier (PCA: 2 components)</th>
-      <td>0.821111</td>
-      <td>0.111111</td>
+      <td>0.861667</td>
       <td>0.111111</td>
       <td>0.000000</td>
+      <td>0.111111</td>
     </tr>
     <tr>
       <th>Random Forest Classifier (PCA: 5 components)</th>
-      <td>0.835556</td>
+      <td>0.875556</td>
       <td>0.000000</td>
-      <td>0.222222</td>
       <td>0.000000</td>
+      <td>0.111111</td>
     </tr>
   </tbody>
 </table>
@@ -14063,9 +14298,104 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>A quick note on accuracy: as shown above, accuracy can be a misleading metric. Take a look at the Random Forest Classifier without any parameter tuning. It has a relatively high accuracy score of 0.835, but it scored a 0 in recall and 0.22 in precision. I think that the unbalanced classes could be contributing to the underwhelming initial performance, so parameter tuning will take on an added performance here.</p>
-<p>Our best performing classifier in terms of recall and precision was the Gaussian Naive Bayes classifier. With a recall of 77%, this classifier correctly flagged more than half of the POIs in our data. That classifier also had the highest F1 score (the harmonic mean of precision and recall).</p>
+<p>A quick note on accuracy: as shown above, accuracy can be a misleading metric. Take a look at the Random Forest Classifier without any parameter tuning. It has a relatively high accuracy score of 0.835, but it scored a 0 in recall and 0.11 in precision. I think that the unbalanced classes could be contributing to the underwhelming initial performance, so parameter tuning will take on an added performance here.</p>
+<p>Once again our best performing classifier in terms of recall and precision was the Gaussian Naive Bayes classifier. With a recall of 77%, this classifier correctly flagged more than half of the POIs in our data. That classifier also had the highest F1 score (the harmonic mean of precision and recall).</p>
 <p>Now let's do some parameter tuning, in the hopes that we might be able to bring up the recall of some our next best performing algorithm in a meaningful way.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Comparing-results-of-old-data-set-to-new-(that-includes-engineered-features)">Comparing results of old data set to new (that includes engineered features)<a class="anchor-link" href="#Comparing-results-of-old-data-set-to-new-(that-includes-engineered-features)">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Below is a table showing the best F1 scores acheived for each algorithm when using both the old and new dataset:</p>
+<table>
+<thead><tr>
+<th></th>
+<th style="text-align:center">New featres used</th>
+<th style="text-align:center">Precision</th>
+<th style="text-align:right">Recall</th>
+<th style="text-align:right">F1 score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adaboost</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">0.22</td>
+<td style="text-align:right">0.22</td>
+<td style="text-align:right">0.22</td>
+</tr>
+<tr>
+<td>Decision Tree</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">0.667</td>
+<td style="text-align:right">0.44</td>
+<td style="text-align:right">0.667</td>
+</tr>
+<tr>
+<td>Naive Bayes</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">0.778</td>
+<td style="text-align:right">0.778</td>
+<td style="text-align:right">0.778</td>
+</tr>
+<tr>
+<td>Random Forest</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">0.11</td>
+<td style="text-align:right">0.11</td>
+<td style="text-align:right">0.33</td>
+</tr>
+<tr>
+<td>Adaboost</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0.44</td>
+<td style="text-align:right">0.44</td>
+<td style="text-align:right">0.44</td>
+</tr>
+<tr>
+<td>Decision Tree</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0.667</td>
+<td style="text-align:right">0.44</td>
+<td style="text-align:right">0.556</td>
+</tr>
+<tr>
+<td>Naive Bayes</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0.778</td>
+<td style="text-align:right">0.778</td>
+<td style="text-align:right">0.778</td>
+</tr>
+<tr>
+<td>Random Forest</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0.22</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">0.22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The new features don't appear to have had any affect on Naive Bayes and the Decision tree algorithms. However, it has improved the Adaboost and had a worse effect on Random Forest F1 scores but a greater precision.</p>
+<p>For our two best performing algorithms - Naive Bayes and Decision Tree we seem to get the best results when we don't include the newly generated features so I will proceed with the old data set.</p>
 
 </div>
 </div>
@@ -14095,14 +14425,10 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.grid_search</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span>
-
-<span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;criterion&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;gini&#39;</span><span class="p">,</span> <span class="s1">&#39;entropy&#39;</span><span class="p">),</span>
     <span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">:</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
     <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
@@ -14123,41 +14449,6 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/Sian/anaconda/envs/DAND/lib/python2.7/site-packages/sklearn/grid_search.py:42: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. This module will be removed in 0.20.
-  DeprecationWarning)
-/Users/Sian/anaconda/envs/DAND/lib/python2.7/site-packages/sklearn/metrics/classification.py:1135: UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 due to no predicted samples.
-  &#39;precision&#39;, &#39;predicted&#39;, average, warn_for)
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[21]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>({&#39;criterion&#39;: &#39;entropy&#39;, &#39;max_depth&#39;: 2, &#39;min_samples_leaf&#39;: 6},
- 0.5469667318982387)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -14169,7 +14460,7 @@ Although we can measure the performance of our model by running run it on a set 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">,</span> <span class="n">X_train_pca5</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -14179,27 +14470,6 @@ Although we can measure the performance of our model by running run it on a set 
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>accuracy 0.89
-precision 0.666666666667
-recall 0.555555555556
-F1 score 0.555555555556
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -14224,7 +14494,7 @@ F1 score 0.555555555556
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="s1">&#39;entropy&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
@@ -14240,87 +14510,6 @@ F1 score 0.555555555556
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[23]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>poi</th>
-      <th>Predicted</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>HIRKO JOSEPH</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>KISHKILL JOSEPH G</th>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>KITCHEN LOUISE</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>KOENIG MARK E</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>KOPPER MICHAEL J</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>LAVORATO JOHN J</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>LAY KENNETH L</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>LEFF DANIEL P</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>LEMAISTRE CHARLES</th>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>LEWIS RICHARD</th>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14343,7 +14532,7 @@ F1 score 0.555555555556
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
@@ -14359,87 +14548,6 @@ F1 score 0.555555555556
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[24]:</div>
-
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>poi</th>
-      <th>Predicted</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>HIRKO JOSEPH</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>KISHKILL JOSEPH G</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>KITCHEN LOUISE</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>KOENIG MARK E</th>
-      <td>True</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>KOPPER MICHAEL J</th>
-      <td>True</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>LAVORATO JOHN J</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>LAY KENNETH L</th>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>LEFF DANIEL P</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>LEMAISTRE CHARLES</th>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>LEWIS RICHARD</th>
-      <td>False</td>
-      <td>True</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
 </div>
 </div>
 
