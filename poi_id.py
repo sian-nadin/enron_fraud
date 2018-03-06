@@ -164,11 +164,17 @@ clf = GridSearchCV(DTC, param_grid=parameters, scoring=scorer)
 clf.fit(X_train_pca5, y_train)
 clf.best_params_, clf.best_score_
 
-## Run the algorithm with paameters from GridSearch
-clf = DecisionTreeClassifier(criterion='entropy', max_depth=2, min_samples_leaf=6)
-clf.fit(X_train_pca5, y_train)
+## Run the Gaussian Naive Bayes algorithm since it has the best results
 
-pred = clf.predict(X_test_pca5)
+clf = DecisionTreeClassifier(splitter="random",
+                             max_depth=4,
+                             criterion='entropy',
+                             min_samples_split=10,
+                             max_leaf_nodes=6,
+                             class_weight="balanced",
+                             random_state=42)
+
+clf.fit(X_train_pca5,y_train)
 
 ### Task 6: Dump your classifier, dataset, and features_list so anyone can
 ### check your results. You do not need to change anything below, but make sure
